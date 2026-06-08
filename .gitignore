@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build output and generated files
+dist/
+build/
+coverage/
+.cache/
+.tmp/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archives and temporary exports
+*.zip
+*.rar
+*.7z
+reports/

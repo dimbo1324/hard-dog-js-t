@@ -1,0 +1,72 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: #151515;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1e1e2f, #151515);
+  font-family: "Press Start 2P", "Courier New", monospace;
+}
+
+.game-shell {
+  position: relative;
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  place-items: center;
+  padding: 24px;
+}
+
+.game-shell::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  content: "";
+  background: radial-gradient(circle, rgb(255 255 255 / 92%) 2px, transparent 2px)
+    0 0 / 10px 10px;
+  opacity: 0.75;
+  animation: move-stars 10s linear infinite;
+}
+
+.game-canvas {
+  position: relative;
+  z-index: 1;
+  display: block;
+  max-width: min(90vw, 1500px);
+  max-height: 90vh;
+  border: 5px solid #000;
+  image-rendering: auto;
+}
+
+.game-error {
+  position: absolute;
+  z-index: 2;
+  max-width: min(90vw, 680px);
+  padding: 16px 20px;
+  margin: 0;
+  color: #fff;
+  text-align: center;
+  background: rgb(0 0 0 / 78%);
+  border: 2px solid rgb(255 255 255 / 45%);
+}
+
+@keyframes move-stars {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 100px 200px;
+  }
+}
