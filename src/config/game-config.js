@@ -1,6 +1,7 @@
 export const CANVAS_CONFIG = Object.freeze({
   WIDTH: 1500,
   HEIGHT: 500,
+  MAX_DEVICE_PIXEL_RATIO: 2,
 });
 
 export const GAME_CONFIG = Object.freeze({
@@ -10,9 +11,13 @@ export const GAME_CONFIG = Object.freeze({
   MAX_PARTICLES: 200,
   MAX_TIME_MINUTES: 0.3,
   INITIAL_LIVES: 10,
+  MAX_LIVES: 12,
   INITIAL_SCORE: 0,
   FONT_COLOR: "black",
   DEBUG_MODE: false,
+  SCORE_PER_SECOND: 1,
+  COMBO_RESET_TIME: 1800,
+  INVULNERABILITY_TIME: 900,
 });
 
 export const PLAYER_CONFIG = Object.freeze({
@@ -108,6 +113,15 @@ export const EFFECT_CONFIG = Object.freeze({
     GRAVITY_INCREMENT: 0.1,
     IMAGE: "fire",
   },
+  SCREEN: {
+    SHAKE_INTENSITY_HIT: 10,
+    SHAKE_INTENSITY_DESTROY: 5,
+    SHAKE_DURATION_HIT: 220,
+    SHAKE_DURATION_DESTROY: 120,
+    FLASH_HIT_ALPHA: 0.32,
+    FLASH_COLLECT_ALPHA: 0.18,
+    FLASH_FADE_RATE: 0.92,
+  },
 });
 
 export const UI_CONFIG = Object.freeze({
@@ -128,28 +142,37 @@ export const UI_CONFIG = Object.freeze({
     SCORE_Y: 50,
     TIME_X: 20,
     TIME_Y: 80,
+    LEVEL_X: 20,
+    LEVEL_Y: 110,
+    HIGHSCORE_X: 20,
+    HIGHSCORE_Y: 140,
     LIVES_START_X: 20,
-    LIVES_Y: 95,
+    LIVES_Y: 150,
     LIVES_SIZE: 25,
     LIVES_SPACING: 25,
     GAME_OVER_TEXT_Y: 0.5,
     GAME_OVER_SUBTEXT_OFFSET: 40,
+    DEBUG_X: 20,
+    DEBUG_Y: 220,
   },
   COLORS: {
     SCORE: "black",
     TIME: "black",
+    LEVEL: "black",
+    HIGHSCORE: "black",
     LIVES: "black",
     WIN_MESSAGE: "black",
     LOSE_MESSAGE: "black",
     RESTART_PROMPT: "black",
+    DEBUG: "black",
   },
   GAME_OVER: {
     WIN_MESSAGE: {
-      TEXT: "Игра закончена !",
+      TEXT: "ВЫ ПОБЕДИЛИ!",
       FONT_FAMILY: "Rubik Wet Paint, fantasy",
     },
     LOSE_MESSAGE: {
-      TEXT: "ВЫ ПРОИГРАЛИ !",
+      TEXT: "ВЫ ПРОИГРАЛИ!",
       FONT_FAMILY: "Press Start 2P, monospace",
     },
     RESTART_PROMPT: {

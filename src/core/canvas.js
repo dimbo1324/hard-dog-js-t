@@ -13,8 +13,15 @@ export function createCanvasContext(canvasId) {
     throw new Error("2D canvas context is not available.");
   }
 
-  canvas.width = CANVAS_CONFIG.WIDTH;
-  canvas.height = CANVAS_CONFIG.HEIGHT;
+  const pixelRatio = Math.min(
+    window.devicePixelRatio || 1,
+    CANVAS_CONFIG.MAX_DEVICE_PIXEL_RATIO
+  );
+
+  canvas.width = CANVAS_CONFIG.WIDTH * pixelRatio;
+  canvas.height = CANVAS_CONFIG.HEIGHT * pixelRatio;
+  canvas.style.aspectRatio = `${CANVAS_CONFIG.WIDTH} / ${CANVAS_CONFIG.HEIGHT}`;
+  context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
   return {
     canvas,

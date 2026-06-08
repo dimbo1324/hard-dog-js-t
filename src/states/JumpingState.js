@@ -9,6 +9,7 @@ export class JumpingState extends State {
   enter() {
     if (this.game.player.onGround()) {
       this.game.player.vy = PLAYER_STATE_CONFIG.JUMP_VELOCITY;
+      this.game.audio.playJump();
     }
 
     const { FRAME_X, MAX_FRAME, FRAME_Y } = PLAYER_STATE_CONFIG.FRAME.JUMPING;

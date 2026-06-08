@@ -23,15 +23,17 @@ export class GameLoop {
   }
 
   animate(timeStamp) {
-    const deltaTime = timeStamp - this.lastTime;
+    const deltaTime = Math.min(timeStamp - this.lastTime, 100);
     this.lastTime = timeStamp;
 
     this.context.clearRect(0, 0, this.width, this.height);
     this.game.update(deltaTime);
     this.game.draw(this.context);
+    this.animationFrameId = requestAnimationFrame(this.animate);
+  }
 
-    if (!this.game.gameOver) {
-      this.animationFrameId = requestAnimationFrame(this.animate);
-    }
+  destroy() {
+    this.stop();
+    this.game.destroy();
   }
 }

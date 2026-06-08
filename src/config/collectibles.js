@@ -1,0 +1,51 @@
+export const COLLECTIBLE_TYPES = Object.freeze({
+  BONE: "bone",
+  HEART: "heart",
+  CLOCK: "clock",
+  SHIELD: "shield",
+});
+
+export const COLLECTIBLE_CONFIG = Object.freeze({
+  WIDTH: 38,
+  HEIGHT: 38,
+  SPEED_X: 1.8,
+  FLOATING_AMPLITUDE: 8,
+  FLOATING_SPEED: 0.08,
+  SPAWN_Y_MIN: 95,
+  SPAWN_Y_MAX_RATIO: 0.72,
+  MAX_ITEMS: 4,
+  TYPES: {
+    [COLLECTIBLE_TYPES.BONE]: {
+      label: "Bone",
+      color: "#f8f0ce",
+      strokeColor: "#3d2b18",
+      score: 3,
+      weight: 0.52,
+      message: "+3",
+    },
+    [COLLECTIBLE_TYPES.HEART]: {
+      label: "Heart",
+      color: "#e63946",
+      strokeColor: "#470d16",
+      lives: 1,
+      weight: 0.18,
+      message: "+1 life",
+    },
+    [COLLECTIBLE_TYPES.CLOCK]: {
+      label: "Clock",
+      color: "#5bc0eb",
+      strokeColor: "#12324a",
+      timeMs: 3_000,
+      weight: 0.18,
+      message: "+3s",
+    },
+    [COLLECTIBLE_TYPES.SHIELD]: {
+      label: "Shield",
+      color: "#8ac926",
+      strokeColor: "#23450f",
+      shieldMs: 3_500,
+      weight: 0.12,
+      message: "Shield",
+    },
+  },
+});

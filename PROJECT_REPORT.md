@@ -1,122 +1,129 @@
-# Project Modernisation Report
+# Project Upgrade Report — Hard Dog v1.1.0
 
-## Определённый язык и стек
+## Summary
 
-Проект написан на чистом JavaScript, HTML и CSS. Основная технология рендера — HTML5 Canvas API. Модули используются через ES Modules. Фреймворки, библиотеки и сборщики не добавлялись.
+The project was upgraded into a more complete Vanilla JavaScript Canvas game while preserving the existing stack:
 
-## Что было изменено
+- HTML;
+- CSS;
+- Vanilla JavaScript ES Modules;
+- Canvas 2D API;
+- Web Audio API.
 
-- Проект приведён к аккуратной структуре Git-репозитория.
-- Точка входа перенесена в корневой `index.html`.
-- Исходный код разложен по зонам ответственности в `src/`.
-- Исправлены нестабильные импорты с разным регистром папок.
-- Устранена папка с пробелами в имени для констант.
-- Введён единый config layer для игровых правил, controls и asset manifest.
-- Добавлен `AssetManager` с кэшированием изображений.
-- Разделены game loop, Canvas bootstrap, input, state machine, UI, enemies, effects и utils.
-- Добавлена базовая обработка ошибок запуска.
-- Добавлены инженерные проверки и тестовая структура.
-- README переписан как практичная документация проекта.
-- Добавлены документы для архитектуры, разработки, безопасности, QA и технического долга.
-- Удалены приватные контакты из публичной документации.
-- Экспортные отчёты и IDE-настройки не включены в финальный проект.
+No frameworks, bundlers or external runtime libraries were added.
 
-## Добавленные файлы
+## Added files
 
-- `.gitignore`
-- `.editorconfig`
-- `.gitattributes`
-- `.env.example`
-- `package.json`
-- `PROJECT_REPORT.md`
+- `src/audio/AudioManager.js`
+- `src/config/collectibles.js`
+- `src/config/game-status.js`
+- `src/config/levels.js`
+- `src/config/settings.js`
+- `src/entities/effects/ScreenEffects.js`
+- `src/entities/items/Collectible.js`
+- `src/storage/GameStorage.js`
+- `src/ui/DomUI.js`
+- `src/utils/clamp.js`
+- `tests/feature-config.test.mjs`
+- `docs/FEATURES.md`
+
+## Reworked files
+
+- `src/game/Game.js`
+- `src/core/game-loop.js`
+- `src/core/canvas.js`
+- `src/input/InputHandler.js`
+- `src/entities/player/Player.js`
+- `src/states/JumpingState.js`
+- `src/ui/CanvasUI.js`
+- `src/styles/main.css`
+- `src/config/controls.js`
+- `src/config/game-config.js`
+- `README.md`
 - `docs/ARCHITECTURE.md`
-- `docs/DEVELOPMENT.md`
-- `docs/SECURITY.md`
-- `docs/MANUAL_QA.md`
-- `docs/TECH_DEBT.md`
-- `tools/dev-server.mjs`
-- `tools/check-imports.mjs`
-- `tools/security-scan.mjs`
-- `tests/config.test.mjs`
-- Новая структура `src/`
+- `package.json`
 
-## Переработанные зоны
+## Gameplay improvements
 
-- `app/classes/Game.js` → `src/game/Game.js`
-- `app/classes/Player.js` → `src/entities/player/Player.js`
-- `app/classes/InputHandler.js` → `src/input/InputHandler.js`
-- `app/classes/UI.js` → `src/ui/CanvasUI.js`
-- `app/classes/States/*` → `src/states/*`
-- `app/classes/Enemies/*` → `src/entities/enemies/*`
-- `app/classes/effects/*` → `src/entities/effects/*`
-- `app/background/*` → `src/rendering/background/*`
-- `app/enums and constants/*` → `src/config/*`
-- `app/links/*` → `src/assets/AssetManager.js` и `src/config/assets.js`
-- `app/main/*` → `src/core/*` и `src/main.js`
-- `app/style.css` → `src/styles/main.css`
+- Added start menu.
+- Added pause / resume.
+- Added restart.
+- Added win and game-over flow.
+- Added three levels.
+- Added collectibles:
+  - bone;
+  - heart;
+  - clock;
+  - shield.
+- Added high score.
+- Added difficulty settings.
+- Added mute setting.
+- Added debug/FPS setting.
+- Added optional touch controls.
+- Added survival score.
+- Added combo score.
+- Added screen shake.
+- Added hit flash and collect flash.
+- Added shield aura.
+- Added procedural audio effects.
 
-## Исправленные проблемы
+## Security and quality notes
 
-- Case-sensitive import bugs: `../Classes`, `../Background`, `../Base`, `StateHIT.js` могли ломаться на Linux/macOS с чувствительной файловой системой.
-- Неправильное название `Enemie` заменено на `Enemy`.
-- Опечатка `handleCollisionSPrites` исправлена в новой структуре.
-- Дублирующее создание `FileManager/Image` заменено на общий `AssetManager`.
-- Магические числа сгруппированы в конфигурационных файлах.
-- Приватные контакты удалены из README.
-- Добавлены базовые проверки на опасные паттерны: `eval`, `innerHTML`, inline handlers, возможные секреты.
-- Добавлена безопасная отдача статических файлов с защитой от path traversal в dev-server.
+- No secrets were added.
+- No external dependencies were added.
+- DOM overlay is created with DOM APIs instead of unsafe `innerHTML` assignment.
+- `localStorage` is used only for non-critical local preferences and high score.
+- Settings are normalized before use.
+- The basic security scan passes.
 
-## Сохранённая бизнес-логика
-
-- Длительность игры: 18 секунд.
-- Начальные жизни: 10.
-- Интервал появления врагов: 1000 мс.
-- Правило победы: счёт больше 2.
-- Правило столкновения: rolling/diving уничтожают врага и дают очко.
-- Обычное столкновение отнимает 1 жизнь и переводит игрока в hit-state.
-- Набор клавиш сохранён, включая русскую раскладку.
-- Debug-режим сохраняет прежний принцип: удерживать `U` 3 секунды.
-
-## Оставшиеся риски
-
-- Restart prompt сохранён, но restart-механика не добавлена, потому что её не было в исходной бизнес-логике.
-- Полноценная browser/e2e-проверка не добавлялась, чтобы не вводить зависимости.
-- Визуальное отображение зависит от спрайтов и Canvas, поэтому часть проверок остаётся ручной.
-- Бинарные font-файлы не включены в итоговый архив; используются fallback-шрифты.
-
-## Выполненные проверки
+## Checks performed
 
 ```bash
 npm run check
 npm test
 ```
 
-Результат:
+Additional smoke check:
 
-- ES Module import paths: passed.
+```bash
+npm start
+curl http://localhost:4173/
+curl http://localhost:4173/src/main.js
+```
+
+## Check results
+
+- Import validation: passed.
 - Basic security scan: passed.
-- Node.js tests: 4 passed.
-- Dev server smoke-test через HTTP: passed.
-- Проверена выдача `index.html`, `src/main.js` и `assets/images/player.png`.
-- Проверено отсутствие font binaries в финальном архиве.
+- Tests: 8 passed.
+- HTTP smoke check: passed.
 
-## Как запустить проект
+## How to run
 
 ```bash
 npm start
 ```
 
-Открыть:
+Open:
 
 ```text
 http://localhost:4173
 ```
 
-## Как продолжить разработку
+## Remaining risks
 
-1. Создать отдельную Git-ветку.
-2. Изменять только нужные модули.
-3. Константы менять в `src/config`.
-4. Новые чистые правила покрывать тестами в `tests/`.
-5. Запускать `npm run check` и `npm test` перед merge.
-6. Ручные сценарии проверять по `docs/MANUAL_QA.md`.
+- Touch controls should be tested on real mobile devices.
+- Procedural audio is intentionally simple.
+- There is no full asset preloader yet.
+- There are no browser automation tests yet.
+
+## Future improvements
+
+Recommended next steps:
+
+1. Add an asset preloader screen.
+2. Add Playwright smoke tests.
+3. Add more enemy types using the existing enemy config pattern.
+4. Add more level themes.
+5. Add a small achievements system.
+6. Add a settings import/export option if needed.

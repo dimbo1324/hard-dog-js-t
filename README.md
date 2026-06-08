@@ -1,111 +1,134 @@
-# Hard Dog JS T
+# Hard Dog — Vanilla JavaScript Canvas Game
 
-**Hard Dog JS T** — браузерная 2D Canvas-игра на чистом **JavaScript ES Modules**, **HTML** и **CSS** без фреймворков, библиотек и сборщиков.
+Hard Dog is a browser-based 2D side-scroller game built without frameworks, bundlers or third-party runtime libraries.
 
-Проект модернизирован как аккуратный Git-репозиторий: код разложен по зонам ответственности, добавлены базовые проверки, документация, Git-инфраструктура и структура для будущих тестов. Игровая бизнес-логика сохранена.
-
-## Стек
+Stack:
 
 - HTML5
 - CSS3
-- Vanilla JavaScript
-- Canvas API
-- ES Modules
-- Node.js только для локального dev-сервера и проверок
+- Vanilla JavaScript ES Modules
+- Canvas 2D API
+- Web Audio API
+- `localStorage` for non-critical local settings and high score
 
-## Быстрый запуск
+## Current gameplay
+
+The game now includes:
+
+- start menu;
+- pause / resume;
+- restart flow;
+- win and game-over screens;
+- three-level progression;
+- enemies with preserved core collision behaviour;
+- collectibles: bone, heart, clock and shield;
+- survival score and combo score;
+- local high score;
+- difficulty settings: Easy, Normal, Hard;
+- mute setting;
+- FPS / debug mode;
+- keyboard controls;
+- optional touch controls;
+- screen shake, hit flash, collect flash and shield aura;
+- simple procedural Web Audio feedback.
+
+## Run locally
 
 ```bash
 npm start
 ```
 
-После запуска откройте:
+Open:
 
 ```text
 http://localhost:4173
 ```
 
-Без Node.js проект также можно открыть через любой статический HTTP-сервер. Открытие через `file://` не рекомендуется, потому что ES Modules и пути ассетов в разных браузерах могут работать нестабильно.
+No build step is required.
 
-## Проверки
+## Checks
 
 ```bash
 npm run check
 npm test
 ```
 
-`npm run check` проверяет локальные ES Module импорты и выполняет базовый security scan по исходникам.
+`npm run check` validates local ES module imports and runs a basic security scan.
 
-## Управление
+`npm test` runs Node.js tests for configuration, controls, levels, statuses and collectible rules.
 
-| Действие | Клавиши |
+## Controls
+
+| Action | Keyboard |
 | --- | --- |
-| Движение влево | `←`, `A`, `Ф` |
-| Движение вправо | `→`, `D`, `В` |
-| Прыжок | `↑`, `W`, `Ц` |
-| Присесть | `↓`, `S`, `Ы` |
-| Перекат / ныряние | `Enter`, `Space` |
-| Debug-режим | удерживать `U` 3 секунды |
+| Move | Arrow keys / WASD |
+| Roll / primary action | Space / Enter |
+| Jump | ArrowUp / W |
+| Dive | ArrowDown / S while airborne |
+| Pause | Esc / P |
+| Restart | R |
+| Mute | M |
+| Debug / FPS | Hold U for 3 seconds or enable in Settings |
 
-## Структура проекта
+Russian keyboard equivalents are also preserved for movement and common actions.
+
+## Project structure
 
 ```text
-hard-dog-js-t/
-├── assets/                 # Изображения и публичные игровые ресурсы
-├── docs/                   # Архитектура, разработка, безопасность, QA
-├── src/
-│   ├── assets/             # Загрузка и кэширование ресурсов
-│   ├── config/             # Константы, управление, asset manifest
-│   ├── core/               # Canvas bootstrap, game loop, error boundary
-│   ├── entities/           # Игровые сущности: player, enemies, effects, base
-│   ├── game/               # Главная модель игры и orchestration
-│   ├── input/              # Обработка клавиатуры
-│   ├── rendering/          # Фоновые слои и отрисовка окружения
-│   ├── states/             # Состояния игрока
-│   ├── styles/             # CSS
-│   ├── ui/                 # Canvas UI
-│   └── utils/              # Переиспользуемые чистые функции
-├── tests/                  # Node.js тесты для стабильных правил проекта
-├── tools/                  # Dev server и инженерные проверки
-├── index.html              # Точка входа
-├── package.json            # Скрипты проекта
-└── README.md
+assets/                 Static game images
+src/
+  assets/               Asset loading
+  audio/                Web Audio manager
+  config/               Game constants, controls, levels, settings
+  core/                 Canvas bootstrap, game loop, error boundary
+  entities/             Player, enemies, particles, items, visual effects
+  game/                 Main Game orchestration
+  input/                Keyboard and virtual touch input
+  rendering/            Background rendering
+  states/               Player finite states
+  storage/              localStorage wrapper
+  styles/               CSS
+  ui/                   Canvas UI and DOM overlay UI
+  utils/                Shared helpers
+docs/                   Engineering documentation
+tests/                  Node.js tests
+tools/                  Dev server and validation scripts
 ```
 
-## Основные бизнес-правила
+## Architecture notes
 
-- Длительность раунда: 18 секунд.
-- Начальное количество жизней: 10.
-- Победа определяется счётом больше 2 после завершения игры.
-- Враги создаются по прежнему интервалу: 1000 мс.
-- Игрок уничтожает врага в состояниях rolling/diving.
-- При обычном столкновении игрок теряет 1 жизнь и переходит в hit-state.
-- Debug-режим переключается удержанием `U` в течение 3 секунд.
+The project remains intentionally simple:
 
-## Как добавлять новую функциональность
+- no framework;
+- no build pipeline;
+- no external runtime dependencies;
+- no server-side game state;
+- no remote API;
+- no secrets.
 
-1. Константы и настройки добавляйте в `src/config/`.
-2. Новые игровые сущности добавляйте в `src/entities/`.
-3. Новые состояния игрока добавляйте в `src/states/` и подключайте в `Player.js`.
-4. UI, который рисуется на Canvas, добавляйте в `src/ui/`.
-5. Чистые функции выносите в `src/utils/` и покрывайте тестами.
-6. После изменений запускайте `npm run check` и `npm test`.
+`Game` owns the runtime state and orchestrates entities, levels, score, items and status transitions.
 
-## Ограничения
+`DomUI` owns accessible overlay screens: menu, pause, final result, settings and touch controls.
 
-- В проекте нет backend-части и авторизации.
-- Проверки являются базовыми и не заменяют полноценный browser/e2e test runner.
-- Restart prompt в Canvas UI сохранён как в исходной версии, но отдельная restart-механика не добавлялась, чтобы не менять существующую бизнес-логику.
-- Локальные бинарные font-файлы не входят в этот архив; CSS использует безопасные fallback-шрифты.
+`CanvasUI` owns in-game HUD rendering: score, timer, level, lives, combo, shield and debug information.
 
-## Документация
+Business constants are kept in `src/config/*`, so gameplay tuning does not require searching across the whole codebase.
 
-- `docs/ARCHITECTURE.md` — архитектурная схема и зоны ответственности.
-- `docs/DEVELOPMENT.md` — процесс разработки и проверки.
-- `docs/SECURITY.md` — базовые security-правила проекта.
-- `docs/MANUAL_QA.md` — ручные сценарии проверки.
-- `docs/TECH_DEBT.md` — известные ограничения и будущие улучшения.
+## Development rules
 
-## Лицензия
+When changing the game:
 
-MIT. Перед публикацией проверьте лицензии всех изображений и внешних ресурсов.
+1. Keep the stack unchanged unless explicitly required.
+2. Keep gameplay constants in `src/config`.
+3. Keep DOM UI in `src/ui/DomUI.js`.
+4. Keep Canvas HUD in `src/ui/CanvasUI.js`.
+5. Keep runtime orchestration in `src/game/Game.js`.
+6. Add tests for new rules or configuration.
+7. Run `npm run check` and `npm test` before committing.
+
+## Known limitations
+
+- Audio is procedural and minimal; no external audio assets are included.
+- High score and settings are local to the browser.
+- Touch controls are intentionally simple and should be manually tested on real mobile devices.
+- The game does not include a full asset preloader screen yet.

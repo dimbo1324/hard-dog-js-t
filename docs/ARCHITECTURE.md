@@ -1,67 +1,97 @@
 # Architecture
 
-## Назначение проекта
+Hard Dog is a framework-free Canvas 2D game using ES Modules.
 
-Проект — одностраничная браузерная Canvas-игра. Вся игровая логика выполняется на клиенте. Сборщик, backend и сторонние runtime-зависимости не используются.
+## Runtime layers
 
-## Архитектурный принцип
+```text
+main.js
+  -> createCanvasContext()
+  -> GameLoop
+  -> Game
+      -> Player
+      -> Enemies
+      -> Collectibles
+      -> Background
+      -> CanvasUI
+      -> InputHandler
+      -> AudioManager
+      -> GameStorage
+  -> DomUI
+```
 
-Код разделён по ответственности:
+## Main responsibilities
 
-- `src/core` — запуск приложения, Canvas context, игровой цикл, глобальная обработка ошибок.
-- `src/game` — orchestration: время, счёт, жизни, массивы сущностей, добавление врагов, очистка удалённых объектов.
-- `src/entities` — игровые объекты: игрок, враги, частицы, эффекты, базовые классы.
-- `src/states` — state machine игрока.
-- `src/input` — ввод с клавиатуры.
-- `src/ui` — Canvas-интерфейс: счёт, время, жизни, game over.
-- `src/rendering` — фоновые слои.
-- `src/config` — игровые константы, управление, пути к ассетам.
-- `src/utils` — чистые функции без привязки к DOM.
+### `src/game/Game.js`
 
-## Поток запуска
+Owns runtime gameplay state:
 
-1. `index.html` подключает `src/main.js` как ES Module.
-2. `main.js` устанавливает глобальный error handler.
-3. После `DOMContentLoaded` создаётся Canvas context.
-4. `GameLoop` создаёт экземпляр `Game`.
-5. `requestAnimationFrame` вызывает `update()` и `draw()` до `gameOver`.
+- current status;
+- current level;
+- score;
+- lives;
+- timers;
+- enemies;
+- collectibles;
+- particles;
+- collisions;
+- high score;
+- settings;
+- game transitions.
 
-## Игровой цикл
+### `src/core/GameLoop.js`
 
-`GameLoop.animate()`:
+Runs `requestAnimationFrame`, caps large frame gaps and keeps rendering alive for menu, pause and final screens.
 
-1. считает `deltaTime`;
-2. очищает Canvas;
-3. вызывает `game.update(deltaTime)`;
-4. вызывает `game.draw(context)`;
-5. продолжает цикл, пока `game.gameOver === false`.
+### `src/input/InputHandler.js`
 
-## State machine игрока
+Handles keyboard input and virtual touch input. It also maps one-shot actions such as pause, restart and mute.
 
-Состояния игрока находятся в `src/states`:
+### `src/ui/DomUI.js`
 
-- `SittingState`
-- `RunningState`
-- `JumpingState`
-- `FallingState`
-- `RollingState`
-- `DivingState`
-- `HitState`
+Owns DOM overlays:
 
-Индексы состояний закреплены в `src/config/states.js`, чтобы бизнес-правила не зависели от магических чисел внутри кода.
+- menu;
+- pause;
+- final result;
+- settings;
+- touch controls.
 
-## Работа с ресурсами
+DOM is created through safe DOM APIs, not string-based `innerHTML` rendering.
 
-Пути к изображениям описаны в `src/config/assets.js`. Загрузка и кэширование изображений выполняется через `AssetManager`, чтобы не создавать одинаковые `Image`-объекты в разных частях игры.
+### `src/ui/CanvasUI.js`
 
-## Границы изменения логики
+Renders in-game HUD on Canvas:
 
-Без отдельного решения не следует менять:
+- score;
+- timer;
+- level;
+- high score;
+- lives;
+- combo;
+- shield;
+- debug info.
 
-- длительность раунда;
-- количество жизней;
-- правила победы/поражения;
-- индексы состояний;
-- размеры спрайтов;
-- интервал появления врагов;
-- правила начисления очков.
+### `src/config/*`
+
+Contains gameplay constants and tunable rules:
+
+- canvas size;
+- player settings;
+- enemy settings;
+- levels;
+- collectibles;
+- controls;
+- statuses;
+- settings.
+
+## Extension points
+
+Add new features by extending the relevant layer:
+
+- new enemy: `src/entities/enemies` + config;
+- new collectible: `src/entities/items` + `collectibles.js`;
+- new player behaviour: `src/states`;
+- new overlay: `src/ui/DomUI.js`;
+- new HUD element: `src/ui/CanvasUI.js`;
+- new persistent preference: `src/storage/GameStorage.js` + `settings.js`.

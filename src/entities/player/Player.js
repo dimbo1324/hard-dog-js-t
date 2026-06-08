@@ -4,7 +4,6 @@ import { PLAYER_CONFIG } from "../../config/game-config.js";
 import { PLAYER_STATES } from "../../config/states.js";
 import { rectanglesIntersect } from "../../utils/collision.js";
 import { CollisionAnimation } from "../effects/CollisionAnimation.js";
-import { FloatingMessage } from "../effects/FloatingMessage.js";
 import { DivingState } from "../../states/DivingState.js";
 import { FallingState } from "../../states/FallingState.js";
 import { HitState } from "../../states/HitState.js";
@@ -54,6 +53,14 @@ export class Player {
   }
 
   draw(context) {
+    if (this.game.hasActiveShield) {
+      this.drawShieldAura(context);
+    }
+
+    if (this.game.invulnerabilityTimer > 0 && Math.floor(this.game.invulnerabilityTimer / 90) % 2 === 0) {
+      context.globalAlpha = 0.58;
+    }
+
     if (this.game.debug) {
       context.strokeRect(this.x, this.y, this.width, this.height);
     }
@@ -69,6 +76,27 @@ export class Player {
       this.width,
       this.height
     );
+    context.globalAlpha = 1;
+  }
+
+  drawShieldAura(context) {
+    context.save();
+    context.strokeStyle = "rgba(138, 201, 38, 0.9)";
+    context.fillStyle = "rgba(138, 201, 38, 0.14)";
+    context.lineWidth = 4;
+    context.beginPath();
+    context.ellipse(
+      this.x + this.width * 0.5,
+      this.y + this.height * 0.5,
+      this.width * 0.64,
+      this.height * 0.7,
+      0,
+      0,
+      Math.PI * 2
+    );
+    context.fill();
+    context.stroke();
+    context.restore();
   }
 
   setState(state, speedModifier) {
@@ -160,24 +188,14 @@ export class Player {
   }
 
   handleEnemyDestroyed(enemy) {
-    this.game.score += PLAYER_CONFIG.SCORE_INCREMENT;
-    this.game.floatingMessages.push(
-      new FloatingMessage(
-        `+${PLAYER_CONFIG.SCORE_INCREMENT}`,
-        enemy.x,
-        enemy.y,
-        Math.floor(Math.random() * 360),
-        50
-      )
-    );
+    this.game.registerEnemyDestroyed(enemy);
   }
 
   handlePlayerHit() {
-    this.setState(PLAYER_STATES.HIT, 0);
-    this.game.lives -= PLAYER_CONFIG.LIVES_DECREMENT;
+    const didTakeDamage = this.game.registerPlayerHit();
 
-    if (this.game.lives <= 0) {
-      this.game.gameOver = true;
+    if (didTakeDamage) {
+      this.setState(PLAYER_STATES.HIT, 0);
     }
   }
 
