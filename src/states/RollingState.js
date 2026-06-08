@@ -15,6 +15,25 @@ export class RollingState extends State {
   }
 
   handleInput(input) {
+    const actionPressed = this.keys.ACTION.some((key) => input.includes(key));
+    const canKeepRolling = actionPressed && this.game.canSustainRoll();
+
+    if (!canKeepRolling && this.game.player.onGround()) {
+      if (actionPressed) {
+        this.game.notifyRollBlocked();
+      }
+      this.game.player.setState(this.states.RUNNING, 1);
+      return;
+    }
+
+    if (!canKeepRolling && !this.game.player.onGround()) {
+      if (actionPressed) {
+        this.game.notifyRollBlocked();
+      }
+      this.game.player.setState(this.states.FALLING, 1);
+      return;
+    }
+
     const { FIRE } = PLAYER_STATE_CONFIG.PARTICLE_OFFSETS;
 
     this.game.particles.unshift(
@@ -25,20 +44,7 @@ export class RollingState extends State {
       )
     );
 
-    const actionPressed = this.keys.ACTION.some((key) => input.includes(key));
-
-    if (!actionPressed && this.game.player.onGround()) {
-      this.game.player.setState(this.states.RUNNING, 1);
-      return;
-    }
-
-    if (!actionPressed && !this.game.player.onGround()) {
-      this.game.player.setState(this.states.FALLING, 1);
-      return;
-    }
-
     if (
-      actionPressed &&
       this.keys.UP.some((key) => input.includes(key)) &&
       this.game.player.onGround()
     ) {

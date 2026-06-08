@@ -19,14 +19,6 @@ export class DivingState extends State {
   handleInput(input) {
     const { FIRE, SPLASH } = PLAYER_STATE_CONFIG.PARTICLE_OFFSETS;
 
-    this.game.particles.unshift(
-      new Fire(
-        this.game,
-        this.game.player.x + this.game.player.width * FIRE.X,
-        this.game.player.y + this.game.player.height * FIRE.Y
-      )
-    );
-
     if (this.game.player.onGround()) {
       this.game.player.setState(this.states.RUNNING, 1);
 
@@ -42,8 +34,23 @@ export class DivingState extends State {
       return;
     }
 
+    if (!this.game.canSustainRoll()) {
+      this.game.notifyRollBlocked();
+      this.game.player.setState(this.states.FALLING, 1);
+      return;
+    }
+
+    this.game.particles.unshift(
+      new Fire(
+        this.game,
+        this.game.player.x + this.game.player.width * FIRE.X,
+        this.game.player.y + this.game.player.height * FIRE.Y
+      )
+    );
+
     if (
       this.keys.ACTION.some((key) => input.includes(key)) &&
+      this.game.requestRoll() &&
       this.game.player.onGround()
     ) {
       this.game.player.setState(this.states.ROLLING, 2);

@@ -35,7 +35,7 @@ export class RunningState extends State {
       return;
     }
 
-    if (this.keys.ACTION.some((key) => input.includes(key))) {
+    if (this.keys.ACTION.some((key) => input.includes(key)) && this.game.requestRoll()) {
       this.game.player.setState(this.states.ROLLING, 2);
     }
   }

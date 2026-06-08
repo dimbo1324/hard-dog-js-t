@@ -3,7 +3,12 @@ import {
   COLLECTIBLE_CONFIG,
   COLLECTIBLE_TYPES,
 } from "../config/collectibles.js";
-import { EFFECT_CONFIG, GAME_CONFIG, PLAYER_CONFIG } from "../config/game-config.js";
+import {
+  EFFECT_CONFIG,
+  GAME_CONFIG,
+  PLAYER_CONFIG,
+  ROLL_STAMINA_CONFIG,
+} from "../config/game-config.js";
 import { GAME_STATUS } from "../config/game-status.js";
 import { LEVEL_CONFIG, LEVELS } from "../config/levels.js";
 import { DIFFICULTY_SETTINGS, normalizeSettings } from "../config/settings.js";
@@ -56,6 +61,10 @@ export class Game extends EventTarget {
     this.scoreTimer = 0;
     this.invulnerabilityTimer = 0;
     this.shieldTimer = 0;
+    this.rollStamina = ROLL_STAMINA_CONFIG.INITIAL_STAMINA;
+    this.rollRecoveryDelayTimer = 0;
+    this.rollBoostTimer = 0;
+    this.rollBlockMessageTimer = 0;
     this.levelMessageTimer = 0;
     this.speed = 0;
     this.background = new Background(this);
@@ -94,12 +103,16 @@ export class Game extends EventTarget {
     this.comboTimer = Math.max(0, this.comboTimer - deltaTime);
     this.invulnerabilityTimer = Math.max(0, this.invulnerabilityTimer - deltaTime);
     this.shieldTimer = Math.max(0, this.shieldTimer - deltaTime);
+    this.rollRecoveryDelayTimer = Math.max(0, this.rollRecoveryDelayTimer - deltaTime);
+    this.rollBoostTimer = Math.max(0, this.rollBoostTimer - deltaTime);
+    this.rollBlockMessageTimer = Math.max(0, this.rollBlockMessageTimer - deltaTime);
     this.levelMessageTimer = Math.max(0, this.levelMessageTimer - deltaTime);
 
     if (this.comboTimer <= 0) {
       this.combo = 0;
     }
 
+    this.updateRollStamina(deltaTime);
     this.updateSurvivalScore(deltaTime);
     this.background.update();
     this.player.update(this.input.activeKeys, deltaTime);
@@ -304,6 +317,76 @@ export class Game extends EventTarget {
     this.scoreTimer = 0;
   }
 
+  updateRollStamina(deltaTime) {
+    if (this.isRollStateActive) {
+      const drainMultiplier = this.hasActiveRollBoost
+        ? ROLL_STAMINA_CONFIG.BOOST_DRAIN_MULTIPLIER
+        : 1;
+      const drainAmount =
+        ROLL_STAMINA_CONFIG.DRAIN_PER_SECOND * drainMultiplier * (deltaTime / 1000);
+
+      this.rollStamina = clamp(
+        this.rollStamina - drainAmount,
+        0,
+        ROLL_STAMINA_CONFIG.MAX_STAMINA
+      );
+
+      if (this.rollStamina <= 0) {
+        this.rollRecoveryDelayTimer = ROLL_STAMINA_CONFIG.EXHAUSTED_RECOVERY_DELAY;
+      }
+      return;
+    }
+
+    if (this.rollRecoveryDelayTimer > 0) {
+      return;
+    }
+
+    this.rollStamina = clamp(
+      this.rollStamina + ROLL_STAMINA_CONFIG.RECOVERY_PER_SECOND * (deltaTime / 1000),
+      0,
+      ROLL_STAMINA_CONFIG.MAX_STAMINA
+    );
+  }
+
+  requestRoll() {
+    if (this.canStartRoll()) {
+      return true;
+    }
+
+    this.notifyRollBlocked();
+    return false;
+  }
+
+  canStartRoll() {
+    return this.rollStamina >= ROLL_STAMINA_CONFIG.MIN_STAMINA_TO_START;
+  }
+
+  canSustainRoll() {
+    return this.rollStamina > 0;
+  }
+
+  notifyRollBlocked() {
+    if (this.rollBlockMessageTimer > 0 || !this.player) {
+      return;
+    }
+
+    this.rollBlockMessageTimer = ROLL_STAMINA_CONFIG.BLOCKED_MESSAGE_COOLDOWN;
+    this.addFloatingMessage("Need roll energy", this.player.x + this.player.width * 0.5, this.player.y);
+  }
+
+  activateRollBoost(config) {
+    const staminaAmount = config.stamina ?? ROLL_STAMINA_CONFIG.BOOST_RECOVERY_AMOUNT;
+    const boostDuration = config.boostMs ?? ROLL_STAMINA_CONFIG.BOOST_DURATION_MS;
+
+    this.rollStamina = clamp(
+      this.rollStamina + staminaAmount,
+      0,
+      ROLL_STAMINA_CONFIG.MAX_STAMINA
+    );
+    this.rollRecoveryDelayTimer = 0;
+    this.rollBoostTimer = Math.max(this.rollBoostTimer, boostDuration);
+  }
+
   updateDiagnostics(deltaTime) {
     this.frameCounter++;
     this.frameTimer += deltaTime;
@@ -393,6 +476,10 @@ export class Game extends EventTarget {
       this.shieldTimer = Math.max(this.shieldTimer, config.shieldMs);
     }
 
+    if (item.type === COLLECTIBLE_TYPES.ROLL_BOOST) {
+      this.activateRollBoost(config);
+    }
+
     this.addFloatingMessage(config.message, item.x, item.y);
     this.screenEffects.flash("255, 255, 255", EFFECT_CONFIG.SCREEN.FLASH_COLLECT_ALPHA);
     this.audio.playCollect();
@@ -453,6 +540,17 @@ export class Game extends EventTarget {
     return this.shieldTimer > 0;
   }
 
+  get hasActiveRollBoost() {
+    return this.rollBoostTimer > 0;
+  }
+
+  get isRollStateActive() {
+    return (
+      this.player?.currentState === this.player?.states[PLAYER_STATES.ROLLING] ||
+      this.player?.currentState === this.player?.states[PLAYER_STATES.DIVING]
+    );
+  }
+
   get snapshot() {
     return {
       status: this.status,
@@ -464,6 +562,9 @@ export class Game extends EventTarget {
       lives: this.lives,
       settings: this.settings,
       isShieldActive: this.hasActiveShield,
+      isRollBoostActive: this.hasActiveRollBoost,
+      rollStamina: this.rollStamina,
+      rollStaminaMax: ROLL_STAMINA_CONFIG.MAX_STAMINA,
     };
   }
 }

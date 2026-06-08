@@ -1,9 +1,9 @@
 {
   "name": "hard-dog-js-t",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
-  "description": "A production-style vanilla JavaScript Canvas 2D side-scroller game with levels, collectibles, settings and touch controls.",
+  "description": "A production-style vanilla JavaScript Canvas 2D side-scroller game with levels, collectibles, roll stamina, settings and touch controls.",
   "scripts": {
     "start": "node ./tools/dev-server.mjs",
     "check": "node ./tools/check-imports.mjs && node ./tools/security-scan.mjs",

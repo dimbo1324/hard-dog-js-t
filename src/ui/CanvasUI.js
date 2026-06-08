@@ -17,6 +17,7 @@ export class CanvasUI {
     this.drawTimer(context);
     this.drawLevel(context);
     this.drawHighScore(context);
+    this.drawRollStamina(context);
     this.drawLives(context);
     this.drawStatusBadges(context);
 
@@ -81,6 +82,50 @@ export class CanvasUI {
     );
   }
 
+  drawRollStamina(context) {
+    const {
+      ROLL_STAMINA_X,
+      ROLL_STAMINA_Y,
+      ROLL_STAMINA_WIDTH,
+      ROLL_STAMINA_HEIGHT,
+    } = UI_CONFIG.POSITION;
+    const ratio = Math.max(0, Math.min(1, this.game.rollStamina / this.game.rollStaminaMax));
+    const fillWidth = ROLL_STAMINA_WIDTH * ratio;
+    const fillColor = this.game.hasActiveRollBoost
+      ? UI_CONFIG.COLORS.ROLL_STAMINA_BOOST
+      : ratio <= 0.18
+        ? UI_CONFIG.COLORS.ROLL_STAMINA_EMPTY
+        : ratio <= 0.4
+          ? UI_CONFIG.COLORS.ROLL_STAMINA_LOW
+          : UI_CONFIG.COLORS.ROLL_STAMINA_READY;
+
+    context.font = `${this.fontSize * 0.55}px ${this.fontFamily}`;
+    context.fillStyle = UI_CONFIG.COLORS.ROLL_STAMINA_LABEL;
+    context.fillText("Roll", ROLL_STAMINA_X, ROLL_STAMINA_Y - 8);
+    context.fillStyle = UI_CONFIG.COLORS.ROLL_STAMINA_TRACK;
+    context.fillRect(
+      ROLL_STAMINA_X,
+      ROLL_STAMINA_Y,
+      ROLL_STAMINA_WIDTH,
+      ROLL_STAMINA_HEIGHT
+    );
+    context.fillStyle = fillColor;
+    context.fillRect(
+      ROLL_STAMINA_X,
+      ROLL_STAMINA_Y,
+      fillWidth,
+      ROLL_STAMINA_HEIGHT
+    );
+    context.strokeStyle = "black";
+    context.lineWidth = 2;
+    context.strokeRect(
+      ROLL_STAMINA_X,
+      ROLL_STAMINA_Y,
+      ROLL_STAMINA_WIDTH,
+      ROLL_STAMINA_HEIGHT
+    );
+  }
+
   drawLives(context) {
     context.fillStyle = UI_CONFIG.COLORS.LIVES;
 
@@ -106,6 +151,10 @@ export class CanvasUI {
       badges.push(`Shield ${(this.game.shieldTimer * 0.001).toFixed(1)}s`);
     }
 
+    if (this.game.hasActiveRollBoost) {
+      badges.push(`Roll boost ${(this.game.rollBoostTimer * 0.001).toFixed(1)}s`);
+    }
+
     if (!badges.length) {
       return;
     }
@@ -124,6 +173,7 @@ export class CanvasUI {
       `State: ${this.game.player.currentState?.state || "unknown"}`,
       `Enemies: ${this.game.enemies.length}`,
       `Items: ${this.game.items.length}`,
+      `Roll stamina: ${Math.round(this.game.rollStamina)}/${this.game.rollStaminaMax}`,
       `x:${Math.round(this.game.player.x)} y:${Math.round(this.game.player.y)}`,
     ];
 

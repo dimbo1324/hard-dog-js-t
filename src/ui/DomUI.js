@@ -83,7 +83,7 @@ export class DomUI {
       createElement("h1", { text: "Hard Dog" }),
       createElement("p", {
         className: "overlay-text",
-        text: "Пройди 3 уровня, собирай бонусы, сбивай врагов в roll/dive-режиме и держи комбо.",
+        text: "Пройди 3 уровня, собирай бонусы, следи за энергией roll, сбивай врагов в roll/dive-режиме и держи комбо.",
       }),
       this.createScoreRow("Рекорд", "high-score"),
       this.createActions([
@@ -92,7 +92,7 @@ export class DomUI {
       ]),
       createElement("p", {
         className: "controls-hint",
-        text: "WASD / стрелки — движение · Space/Enter — roll/start · P/Esc — pause · M — mute · R — restart",
+        text: "WASD / стрелки — движение · Space/Enter — roll/start · энергия roll восстанавливается со временем · P/Esc — pause · M — mute · R — restart",
       })
     );
     return card;

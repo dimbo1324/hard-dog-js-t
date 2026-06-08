@@ -71,6 +71,11 @@ export class Collectible {
       return;
     }
 
+    if (this.type === COLLECTIBLE_TYPES.ROLL_BOOST) {
+      this.drawRollBoost(context);
+      return;
+    }
+
     this.drawBone(context);
   }
 
@@ -146,6 +151,22 @@ export class Collectible {
     context.lineTo(0, 19);
     context.lineTo(-12, 10);
     context.lineTo(-17, -10);
+    context.closePath();
+    context.fill();
+    context.stroke();
+  }
+
+  drawRollBoost(context) {
+    context.fillStyle = this.config.color;
+    context.strokeStyle = this.config.strokeColor;
+    context.lineWidth = 3;
+    context.beginPath();
+    context.moveTo(4, -20);
+    context.lineTo(-12, 2);
+    context.lineTo(0, 2);
+    context.lineTo(-5, 20);
+    context.lineTo(15, -5);
+    context.lineTo(3, -5);
     context.closePath();
     context.fill();
     context.stroke();

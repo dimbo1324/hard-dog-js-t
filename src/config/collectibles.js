@@ -3,6 +3,7 @@ export const COLLECTIBLE_TYPES = Object.freeze({
   HEART: "heart",
   CLOCK: "clock",
   SHIELD: "shield",
+  ROLL_BOOST: "rollBoost",
 });
 
 export const COLLECTIBLE_CONFIG = Object.freeze({
@@ -20,7 +21,7 @@ export const COLLECTIBLE_CONFIG = Object.freeze({
       color: "#f8f0ce",
       strokeColor: "#3d2b18",
       score: 3,
-      weight: 0.52,
+      weight: 0.44,
       message: "+3",
     },
     [COLLECTIBLE_TYPES.HEART]: {
@@ -46,6 +47,15 @@ export const COLLECTIBLE_CONFIG = Object.freeze({
       shieldMs: 3_500,
       weight: 0.12,
       message: "Shield",
+    },
+    [COLLECTIBLE_TYPES.ROLL_BOOST]: {
+      label: "Roll Boost",
+      color: "#f77f00",
+      strokeColor: "#3d1f00",
+      stamina: 45,
+      boostMs: 5_000,
+      weight: 0.08,
+      message: "Roll boost",
     },
   },
 });

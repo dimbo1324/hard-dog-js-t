@@ -1,5 +1,14 @@
 # Gameplay Features
 
+## Added in v1.2.0
+
+- Roll stamina resource: holding `Space` / `Enter` no longer gives unlimited roll.
+- Roll stamina drains during rolling/diving and recovers after the player leaves roll mode.
+- A minimum stamina threshold is required before roll can start again.
+- New roll boost collectible restores stamina and temporarily reduces stamina drain.
+- Canvas HUD now shows a roll stamina bar and active roll boost timer.
+- Debug overlay now includes current roll stamina.
+
 ## Added in v1.1.0
 
 - Start menu.

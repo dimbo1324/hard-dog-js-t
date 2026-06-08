@@ -1,8 +1,8 @@
-# Project Upgrade Report — Hard Dog v1.1.0
+# Project Upgrade Report — Hard Dog v1.2.0
 
 ## Summary
 
-The project was upgraded into a more complete Vanilla JavaScript Canvas game while preserving the existing stack:
+The project was upgraded with a limited roll stamina mechanic while preserving the existing stack and the current game architecture:
 
 - HTML;
 - CSS;
@@ -12,68 +12,61 @@ The project was upgraded into a more complete Vanilla JavaScript Canvas game whi
 
 No frameworks, bundlers or external runtime libraries were added.
 
+## What changed
+
+- Added roll stamina: holding `Space` / `Enter` no longer allows infinite roll.
+- Roll stamina drains while the player is in rolling/diving states.
+- Roll stamina recovers automatically after the player exits roll mode.
+- Added a minimum stamina threshold before roll can start again.
+- Added roll boost collectible.
+- Roll boost restores stamina and temporarily reduces stamina drain.
+- Added Canvas HUD bar for roll stamina.
+- Added active roll boost timer badge.
+- Added roll stamina information to the debug overlay.
+- Updated documentation and QA checklist.
+- Added tests for roll stamina and roll boost configuration.
+
 ## Added files
 
-- `src/audio/AudioManager.js`
-- `src/config/collectibles.js`
-- `src/config/game-status.js`
-- `src/config/levels.js`
-- `src/config/settings.js`
-- `src/entities/effects/ScreenEffects.js`
-- `src/entities/items/Collectible.js`
-- `src/storage/GameStorage.js`
-- `src/ui/DomUI.js`
-- `src/utils/clamp.js`
-- `tests/feature-config.test.mjs`
-- `docs/FEATURES.md`
+No new files were required for this feature. The change was implemented inside the existing project structure.
 
 ## Reworked files
 
-- `src/game/Game.js`
-- `src/core/game-loop.js`
-- `src/core/canvas.js`
-- `src/input/InputHandler.js`
-- `src/entities/player/Player.js`
-- `src/states/JumpingState.js`
-- `src/ui/CanvasUI.js`
-- `src/styles/main.css`
-- `src/config/controls.js`
 - `src/config/game-config.js`
+- `src/config/collectibles.js`
+- `src/game/Game.js`
+- `src/states/RunningState.js`
+- `src/states/JumpingState.js`
+- `src/states/SittingState.js`
+- `src/states/RollingState.js`
+- `src/states/DivingState.js`
+- `src/entities/items/Collectible.js`
+- `src/ui/CanvasUI.js`
+- `src/ui/DomUI.js`
+- `tests/feature-config.test.mjs`
 - `README.md`
-- `docs/ARCHITECTURE.md`
+- `docs/FEATURES.md`
+- `docs/MANUAL_QA.md`
 - `package.json`
 
-## Gameplay improvements
+## Gameplay behaviour
 
-- Added start menu.
-- Added pause / resume.
-- Added restart.
-- Added win and game-over flow.
-- Added three levels.
-- Added collectibles:
-  - bone;
-  - heart;
-  - clock;
-  - shield.
-- Added high score.
-- Added difficulty settings.
-- Added mute setting.
-- Added debug/FPS setting.
-- Added optional touch controls.
-- Added survival score.
-- Added combo score.
-- Added screen shake.
-- Added hit flash and collect flash.
-- Added shield aura.
-- Added procedural audio effects.
+Roll now works as a limited resource:
+
+1. The player can start roll only when stamina is above the configured minimum.
+2. Stamina drains while rolling or diving.
+3. When stamina reaches zero, the player exits roll mode.
+4. If the player keeps holding the action key without enough stamina, a short floating message is shown.
+5. Stamina recovers after the player leaves roll mode.
+6. The new roll boost collectible restores stamina and temporarily makes stamina drain slower.
 
 ## Security and quality notes
 
 - No secrets were added.
 - No external dependencies were added.
-- DOM overlay is created with DOM APIs instead of unsafe `innerHTML` assignment.
-- `localStorage` is used only for non-critical local preferences and high score.
-- Settings are normalized before use.
+- No unsafe DOM rendering was introduced.
+- The new collectible is generated through the existing weighted collectible system.
+- Roll tuning values are centralized in `ROLL_STAMINA_CONFIG`.
 - The basic security scan passes.
 
 ## Checks performed
@@ -86,7 +79,7 @@ npm test
 Additional smoke check:
 
 ```bash
-npm start
+node ./tools/dev-server.mjs
 curl http://localhost:4173/
 curl http://localhost:4173/src/main.js
 ```
@@ -95,7 +88,7 @@ curl http://localhost:4173/src/main.js
 
 - Import validation: passed.
 - Basic security scan: passed.
-- Tests: 8 passed.
+- Tests: 10 passed.
 - HTTP smoke check: passed.
 
 ## How to run
@@ -112,18 +105,17 @@ http://localhost:4173
 
 ## Remaining risks
 
+- Exact stamina drain/recovery values may need tuning after real playtesting.
 - Touch controls should be tested on real mobile devices.
-- Procedural audio is intentionally simple.
-- There is no full asset preloader yet.
 - There are no browser automation tests yet.
 
 ## Future improvements
 
 Recommended next steps:
 
-1. Add an asset preloader screen.
-2. Add Playwright smoke tests.
-3. Add more enemy types using the existing enemy config pattern.
-4. Add more level themes.
-5. Add a small achievements system.
-6. Add a settings import/export option if needed.
+1. Fine-tune roll stamina values after manual playtesting.
+2. Add an asset preloader screen.
+3. Add Playwright smoke tests.
+4. Add more enemy types using the existing enemy config pattern.
+5. Add more level themes.
+6. Add a small achievements system.

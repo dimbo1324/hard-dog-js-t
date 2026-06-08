@@ -21,7 +21,8 @@ The game now includes:
 - win and game-over screens;
 - three-level progression;
 - enemies with preserved core collision behaviour;
-- collectibles: bone, heart, clock and shield;
+- collectibles: bone, heart, clock, shield and roll boost;
+- roll stamina with recovery and boost extension;
 - survival score and combo score;
 - local high score;
 - difficulty settings: Easy, Normal, Hard;
@@ -29,7 +30,7 @@ The game now includes:
 - FPS / debug mode;
 - keyboard controls;
 - optional touch controls;
-- screen shake, hit flash, collect flash and shield aura;
+- screen shake, hit flash, collect flash, shield aura and roll stamina HUD;
 - simple procedural Web Audio feedback.
 
 ## Run locally
@@ -63,6 +64,7 @@ npm test
 | --- | --- |
 | Move | Arrow keys / WASD |
 | Roll / primary action | Space / Enter |
+| Roll stamina | Drains while rolling/diving; recovers after release; roll boost collectible restores and extends it |
 | Jump | ArrowUp / W |
 | Dive | ArrowDown / S while airborne |
 | Pause | Esc / P |
@@ -110,7 +112,7 @@ The project remains intentionally simple:
 
 `DomUI` owns accessible overlay screens: menu, pause, final result, settings and touch controls.
 
-`CanvasUI` owns in-game HUD rendering: score, timer, level, lives, combo, shield and debug information.
+`CanvasUI` owns in-game HUD rendering: score, timer, level, lives, roll stamina, combo, shield, roll boost and debug information.
 
 Business constants are kept in `src/config/*`, so gameplay tuning does not require searching across the whole codebase.
 

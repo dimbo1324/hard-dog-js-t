@@ -20,6 +20,19 @@ export const GAME_CONFIG = Object.freeze({
   INVULNERABILITY_TIME: 900,
 });
 
+export const ROLL_STAMINA_CONFIG = Object.freeze({
+  MAX_STAMINA: 100,
+  INITIAL_STAMINA: 100,
+  MIN_STAMINA_TO_START: 18,
+  DRAIN_PER_SECOND: 38,
+  RECOVERY_PER_SECOND: 24,
+  EXHAUSTED_RECOVERY_DELAY: 700,
+  BOOST_RECOVERY_AMOUNT: 45,
+  BOOST_DURATION_MS: 5_000,
+  BOOST_DRAIN_MULTIPLIER: 0.55,
+  BLOCKED_MESSAGE_COOLDOWN: 800,
+});
+
 export const PLAYER_CONFIG = Object.freeze({
   INITIAL_SPEED: 0,
   MAX_SPEED: 10,
@@ -153,7 +166,11 @@ export const UI_CONFIG = Object.freeze({
     GAME_OVER_TEXT_Y: 0.5,
     GAME_OVER_SUBTEXT_OFFSET: 40,
     DEBUG_X: 20,
-    DEBUG_Y: 220,
+    DEBUG_Y: 280,
+    ROLL_STAMINA_X: 20,
+    ROLL_STAMINA_Y: 212,
+    ROLL_STAMINA_WIDTH: 220,
+    ROLL_STAMINA_HEIGHT: 14,
   },
   COLORS: {
     SCORE: "black",
@@ -165,6 +182,12 @@ export const UI_CONFIG = Object.freeze({
     LOSE_MESSAGE: "black",
     RESTART_PROMPT: "black",
     DEBUG: "black",
+    ROLL_STAMINA_LABEL: "black",
+    ROLL_STAMINA_TRACK: "rgba(0, 0, 0, 0.35)",
+    ROLL_STAMINA_READY: "#25a244",
+    ROLL_STAMINA_LOW: "#f5c542",
+    ROLL_STAMINA_EMPTY: "#ef476f",
+    ROLL_STAMINA_BOOST: "#5bc0eb",
   },
   GAME_OVER: {
     WIN_MESSAGE: {
